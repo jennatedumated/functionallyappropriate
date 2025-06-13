@@ -13,7 +13,7 @@ const Layout: React.FC = () => {
 
   // Close sidebar when clicking outside on mobile
   const handleContentClick = () => {
-    if (isSidebarOpen) {
+    if (isSidebarOpen && window.innerWidth < 768) {
       setIsSidebarOpen(false);
     }
   };
@@ -35,7 +35,7 @@ const Layout: React.FC = () => {
         )}
         
         <main 
-          className="flex-1 p-4 md:p-6 pb-20 md:pb-6 page-transition"
+          className="flex-1 p-4 md:p-6 pb-20 md:pb-6 page-transition md:ml-0"
           onClick={handleContentClick}
         >
           <Outlet />
