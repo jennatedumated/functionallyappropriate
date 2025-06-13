@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import StudentProfile from '../components/dashboard/StudentProfile';
 import TabNavigation, { TabType } from '../components/dashboard/TabNavigation';
 import OverviewTab from '../components/dashboard/tabs/OverviewTab';
 import DemographicsTab from '../components/dashboard/tabs/DemographicsTab';
@@ -100,7 +99,10 @@ const StudentDashboard: React.FC = () => {
           <OverviewTab 
             goals={goals} 
             onToggleGoal={handleToggleGoal} 
-            selectedDate={selectedDate} 
+            selectedDate={selectedDate}
+            student={student}
+            onSensoryBreak={handleSensoryBreak}
+            onAddToken={handleAddToken}
           />
         );
       case 'demographics':
@@ -164,12 +166,6 @@ const StudentDashboard: React.FC = () => {
 
   return (
     <div className="animate-fade-in space-y-6">
-      <StudentProfile 
-        student={student}
-        onSensoryBreak={handleSensoryBreak}
-        onAddToken={handleAddToken}
-      />
-      
       <div className="bg-bg-primary rounded-lg shadow border border-border">
         <div className="p-6">
           <TabNavigation 

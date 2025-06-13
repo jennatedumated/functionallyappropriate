@@ -1,5 +1,6 @@
 import React from 'react';
 import DailyGoals from '../DailyGoals';
+import StudentProfile from '../StudentProfile';
 import { Calendar, TrendingUp, AlertCircle, CheckCircle, FileText, Users } from 'lucide-react';
 import { addDays, addMonths } from 'date-fns';
 
@@ -15,9 +16,28 @@ interface OverviewTabProps {
   goals: Goal[];
   onToggleGoal: (goalId: number) => void;
   selectedDate: Date;
+  student: {
+    id: number;
+    name: string;
+    grade: string;
+    program: string;
+    avatar?: string;
+    dailyProgress: number;
+    tokens: number;
+    nextBreak?: string;
+  };
+  onSensoryBreak: () => void;
+  onAddToken: () => void;
 }
 
-const OverviewTab: React.FC<OverviewTabProps> = ({ goals, onToggleGoal, selectedDate }) => {
+const OverviewTab: React.FC<OverviewTabProps> = ({ 
+  goals, 
+  onToggleGoal, 
+  selectedDate, 
+  student,
+  onSensoryBreak,
+  onAddToken 
+}) => {
   // Generate upcoming IEP and progress report dates
   const upcomingEvents = [
     { 
@@ -129,6 +149,13 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ goals, onToggleGoal, selected
 
   return (
     <div className="space-y-6">
+      {/* Student Profile - moved from main dashboard */}
+      <StudentProfile 
+        student={student}
+        onSensoryBreak={onSensoryBreak}
+        onAddToken={onAddToken}
+      />
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DailyGoals 
           goals={goals} 
