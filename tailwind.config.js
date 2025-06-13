@@ -22,6 +22,9 @@ export default {
         '84': '21rem',
         '96': '24rem',
       },
+      screens: {
+        'xs': '475px',
+      },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in-out',
       },

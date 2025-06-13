@@ -19,10 +19,10 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen container-safe">
       <Header isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       
-      <div className="flex flex-1 relative">
+      <div className="flex flex-1 relative container-safe">
         <Sidebar isOpen={isSidebarOpen} />
         
         {/* Overlay for mobile when sidebar is open */}
@@ -35,7 +35,7 @@ const Layout: React.FC = () => {
         )}
         
         <main 
-          className="flex-1 p-4 md:p-6 pb-20 md:pb-6 page-transition md:ml-0"
+          className="flex-1 p-3 sm:p-4 md:p-6 pb-20 md:pb-6 page-transition container-safe"
           onClick={handleContentClick}
         >
           <Outlet />

@@ -38,7 +38,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
   ];
 
   return (
-    <div className="border-b border-border mb-6">
+    <div className="border-b border-border mb-4 sm:mb-6 container-safe">
       <div className="flex overflow-x-auto scrollbar-hide">
         {tabs.map(tab => {
           const Icon = tab.icon;
@@ -46,14 +46,14 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex items-center space-x-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 sm:py-3 border-b-2 transition-colors whitespace-nowrap flex-shrink-0 text-sm sm:text-base ${
                 activeTab === tab.id
                   ? 'border-purple text-purple font-medium'
                   : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'
               }`}
             >
-              <Icon size={18} />
-              <span className="hidden sm:inline">{tab.label}</span>
+              <Icon size={16} className="sm:w-5 sm:h-5" />
+              <span className="hidden xs:inline sm:inline">{tab.label}</span>
             </button>
           );
         })}

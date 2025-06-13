@@ -35,15 +35,15 @@ const DailyGoals: React.FC<DailyGoalsProps> = ({ goals, onToggleGoal, selectedDa
   };
 
   return (
-    <div className="card">
-      <div className="flex items-center justify-between mb-4">
+    <div className="card container-safe">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
         <div className="flex items-center space-x-2">
-          <Target className="text-purple" size={20} />
+          <Target className="text-purple flex-shrink-0" size={20} />
           <h3 className="text-lg font-semibold">Today's Goals</h3>
         </div>
         <div className="flex items-center space-x-2 text-sm text-text-secondary">
-          <Calendar size={16} />
-          <span>{getDaySchedule(selectedDate)}</span>
+          <Calendar size={16} className="flex-shrink-0" />
+          <span className="truncate">{getDaySchedule(selectedDate)}</span>
         </div>
       </div>
       
@@ -73,7 +73,7 @@ const DailyGoals: React.FC<DailyGoalsProps> = ({ goals, onToggleGoal, selectedDa
             }`}
             onClick={() => onToggleGoal(goal.id)}
           >
-            <button className="mt-0.5">
+            <button className="mt-0.5 flex-shrink-0">
               {goal.completed ? (
                 <CheckCircle2 size={20} className="text-green" />
               ) : (
@@ -81,9 +81,9 @@ const DailyGoals: React.FC<DailyGoalsProps> = ({ goals, onToggleGoal, selectedDa
               )}
             </button>
             
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
                   goal.subject === 'ELA' ? 'bg-teal/20 text-teal' :
                   goal.subject === 'Math' ? 'bg-gold/20 text-gold' :
                   goal.subject === 'Social Skills' ? 'bg-green/20 text-green' :
@@ -92,10 +92,10 @@ const DailyGoals: React.FC<DailyGoalsProps> = ({ goals, onToggleGoal, selectedDa
                   {goal.subject}
                 </span>
                 {goal.dueTime && (
-                  <span className="text-xs text-text-secondary">{goal.dueTime}</span>
+                  <span className="text-xs text-text-secondary flex-shrink-0">{goal.dueTime}</span>
                 )}
               </div>
-              <p className={`mt-1 ${goal.completed ? 'line-through text-text-secondary' : ''}`}>
+              <p className={`mt-1 text-sm sm:text-base ${goal.completed ? 'line-through text-text-secondary' : ''}`}>
                 {goal.description}
               </p>
             </div>
