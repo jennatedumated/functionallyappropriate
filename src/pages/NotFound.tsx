@@ -8,7 +8,7 @@ const NotFound: React.FC = () => {
       <h1 className="text-4xl font-bold mb-4">404</h1>
       <p className="text-xl text-text-secondary mb-8">Page not found</p>
       <Link 
-        to="/" 
+        to="/dashboard" 
         className="btn bg-accent-purple flex items-center gap-2"
       >
         <Home size={16} />

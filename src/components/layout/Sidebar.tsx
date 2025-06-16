@@ -8,10 +8,10 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const navItems = [
-    { path: '/scheduling', label: 'Scheduling', icon: <Calendar className="text-teal" size={20} />, accent: 'teal' },
-    { path: '/goals', label: 'Goal Writing', icon: <Target className="text-green" size={20} />, accent: 'green' },
-    { path: '/reports', label: 'Report Drafting', icon: <FileText className="text-gold" size={20} />, accent: 'gold' },
-    { path: '/dashboard', label: 'Student Dashboard', icon: <BarChart3 className="text-purple" size={20} />, accent: 'purple' },
+    { path: '/app/scheduling', label: 'Scheduling', icon: <Calendar className="text-teal" size={20} />, accent: 'teal' },
+    { path: '/app/goals', label: 'Goal Writing', icon: <Target className="text-green" size={20} />, accent: 'green' },
+    { path: '/app/reports', label: 'Report Drafting', icon: <FileText className="text-gold" size={20} />, accent: 'gold' },
+    { path: '/app/dashboard', label: 'Student Dashboard', icon: <BarChart3 className="text-purple" size={20} />, accent: 'purple' },
   ];
 
   return (

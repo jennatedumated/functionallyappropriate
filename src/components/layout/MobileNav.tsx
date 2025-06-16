@@ -4,10 +4,10 @@ import { Calendar, Target, FileText, BarChart3 } from 'lucide-react';
 
 const MobileNav: React.FC = () => {
   const navItems = [
-    { path: '/scheduling', label: 'Schedule', icon: <Calendar size={20} />, accent: 'teal' },
-    { path: '/goals', label: 'Goals', icon: <Target size={20} />, accent: 'green' },
-    { path: '/reports', label: 'Reports', icon: <FileText size={20} />, accent: 'gold' },
-    { path: '/dashboard', label: 'Dashboard', icon: <BarChart3 size={20} />, accent: 'purple' },
+    { path: '/app/scheduling', label: 'Schedule', icon: <Calendar size={20} />, accent: 'teal' },
+    { path: '/app/goals', label: 'Goals', icon: <Target size={20} />, accent: 'green' },
+    { path: '/app/reports', label: 'Reports', icon: <FileText size={20} />, accent: 'gold' },
+    { path: '/app/dashboard', label: 'Dashboard', icon: <BarChart3 size={20} />, accent: 'purple' },
   ];
 
   return (
