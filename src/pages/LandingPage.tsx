@@ -48,7 +48,7 @@ const LandingPage: React.FC = () => {
               <div className="w-8 h-8 bg-purple rounded-lg flex items-center justify-center">
                 <Sparkles className="text-white" size={20} />
               </div>
-              <span className="text-xl font-semibold">IEP Case Manager</span>
+              <span className="text-xl font-semibold">BetterSped</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link 
@@ -144,7 +144,7 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-6">
-              Why Special Education Teams Choose Our Platform
+              Why Special Education Teams Choose BetterSped
             </h2>
             <p className="text-lg text-text-secondary max-w-3xl mx-auto">
               Join hundreds of educators who have transformed their IEP management process
@@ -243,10 +243,10 @@ const LandingPage: React.FC = () => {
               <div className="w-6 h-6 bg-purple rounded-md flex items-center justify-center">
                 <Sparkles className="text-white" size={14} />
               </div>
-              <span className="text-lg font-semibold">IEP Case Manager</span>
+              <span className="text-lg font-semibold">BetterSped</span>
             </div>
             <div className="text-text-secondary text-sm">
-              © 2025 IEP Case Manager. Empowering special education professionals.
+              © 2025 BetterSped. Empowering special education professionals.
             </div>
           </div>
         </div>

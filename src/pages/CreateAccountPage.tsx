@@ -578,7 +578,7 @@ const CreateAccountPage: React.FC = () => {
               <div className="w-8 h-8 bg-purple rounded-lg flex items-center justify-center">
                 <Shield className="text-white" size={20} />
               </div>
-              <span className="text-xl font-semibold">IEP Case Manager</span>
+              <span className="text-xl font-semibold">BetterSped</span>
             </Link>
             <Link 
               to="/" 
