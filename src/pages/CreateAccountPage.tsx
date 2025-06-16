@@ -13,6 +13,7 @@ interface FormData {
   // Role & Experience
   profession: string[];
   otherProfession: string;
+  studentTypes: string[];
   yearsExperience: string;
   schoolSetting: string[];
   otherSchoolSetting: string;
@@ -43,6 +44,7 @@ const CreateAccountPage: React.FC = () => {
     lastName: '',
     profession: [],
     otherProfession: '',
+    studentTypes: [],
     yearsExperience: '',
     schoolSetting: [],
     otherSchoolSetting: '',
@@ -61,14 +63,22 @@ const CreateAccountPage: React.FC = () => {
 
   const professionOptions = [
     'Special Education Teacher',
-    'Special Education Case Manager',
+    'Speech Language Pathologist',
+    'Occupational Therapist',
+    'Behavior Specialist',
     'School Psychologist',
-    'Administrator',
-    'Related Service Provider (SLP, OT, PT)',
+    'Physical Therapist',
     'Other'
   ];
 
+  const studentTypeOptions = [
+    'Mild/Moderate Disabilities',
+    'Extensive Support Needs (ESN)',
+    'Both'
+  ];
+
   const schoolSettingOptions = [
+    'Preschool/PreK',
     'Elementary School',
     'Middle School',
     'High School',
@@ -80,7 +90,7 @@ const CreateAccountPage: React.FC = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleMultiSelect = (field: 'profession' | 'schoolSetting', value: string) => {
+  const handleMultiSelect = (field: 'profession' | 'studentTypes' | 'schoolSetting', value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: prev[field].includes(value)
@@ -96,7 +106,8 @@ const CreateAccountPage: React.FC = () => {
                  formData.firstName && formData.lastName && 
                  formData.password === formData.confirmPassword);
       case 2:
-        return !!(formData.profession.length > 0 && formData.yearsExperience && formData.caseloadSize);
+        return !!(formData.profession.length > 0 && formData.studentTypes.length > 0 && 
+                 formData.yearsExperience && formData.caseloadSize);
       case 3:
         return true; // All fields are optional but encouraged
       case 4:
@@ -144,8 +155,27 @@ const CreateAccountPage: React.FC = () => {
     }
   };
 
+  const getStepDescription = (step: number) => {
+    switch (step) {
+      case 1: return 'Let\'s start with your basic account information';
+      case 2: return 'Tell us about your professional background';
+      case 3: return 'Help us understand your current workflow challenges';
+      case 4: return 'Review your information and complete your account setup';
+      default: return '';
+    }
+  };
+
   const renderStep1 = () => (
     <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h3 className="text-lg font-medium text-text-primary mb-2">
+          Welcome to BetterSped!
+        </h3>
+        <p className="text-text-secondary">
+          {getStepDescription(1)}
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-text-primary mb-2">
@@ -237,6 +267,15 @@ const CreateAccountPage: React.FC = () => {
 
   const renderStep2 = () => (
     <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h3 className="text-lg font-medium text-text-primary mb-2">
+          Tell us about your role
+        </h3>
+        <p className="text-text-secondary">
+          {getStepDescription(2)}
+        </p>
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-text-primary mb-3">
           Profession/Role * (Select all that apply)
@@ -263,6 +302,42 @@ const CreateAccountPage: React.FC = () => {
             placeholder="Please specify your profession"
           />
         )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-text-primary mb-3">
+          Student Population * (Select all that apply)
+        </label>
+        <div className="space-y-3">
+          {studentTypeOptions.map((option) => (
+            <label key={option} className="flex items-start space-x-3 p-4 border border-border rounded-lg hover:border-purple/30 cursor-pointer transition-all">
+              <input
+                type="checkbox"
+                checked={formData.studentTypes.includes(option)}
+                onChange={() => handleMultiSelect('studentTypes', option)}
+                className="w-4 h-4 text-purple border-border rounded focus:ring-purple mt-0.5"
+              />
+              <div>
+                <span className="text-sm font-medium">{option}</span>
+                {option === 'Mild/Moderate Disabilities' && (
+                  <p className="text-xs text-text-secondary mt-1">
+                    Students with learning disabilities, mild intellectual disabilities, autism spectrum disorders, etc.
+                  </p>
+                )}
+                {option === 'Extensive Support Needs (ESN)' && (
+                  <p className="text-xs text-text-secondary mt-1">
+                    Students requiring intensive, ongoing support across multiple life domains
+                  </p>
+                )}
+                {option === 'Both' && (
+                  <p className="text-xs text-text-secondary mt-1">
+                    I work with students across the full spectrum of support needs
+                  </p>
+                )}
+              </div>
+            </label>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -350,10 +425,10 @@ const CreateAccountPage: React.FC = () => {
     <div className="space-y-8">
       <div className="text-center mb-8">
         <h3 className="text-lg font-medium text-text-primary mb-2">
-          Help us understand your current workflow
+          Help us understand your workflow
         </h3>
         <p className="text-text-secondary">
-          This information helps us personalize your experience and provide targeted support
+          {getStepDescription(3)}
         </p>
       </div>
 
@@ -381,7 +456,7 @@ const CreateAccountPage: React.FC = () => {
                   onChange={() => handleInputChange('schedulingComfort', rating)}
                   className="w-4 h-4 text-teal border-border focus:ring-teal"
                 />
-                <span className="text-xs text-text-secondary mt-1">
+                <span className="text-xs text-text-secondary mt-1 text-center">
                   {rating === 1 ? 'Very Uncomfortable' : rating === 5 ? 'Very Comfortable' : rating}
                 </span>
               </label>
@@ -427,7 +502,7 @@ const CreateAccountPage: React.FC = () => {
                   onChange={() => handleInputChange('goalWritingComfort', rating)}
                   className="w-4 h-4 text-green border-border focus:ring-green"
                 />
-                <span className="text-xs text-text-secondary mt-1">
+                <span className="text-xs text-text-secondary mt-1 text-center">
                   {rating === 1 ? 'Very Uncomfortable' : rating === 5 ? 'Very Comfortable' : rating}
                 </span>
               </label>
@@ -473,7 +548,7 @@ const CreateAccountPage: React.FC = () => {
                   onChange={() => handleInputChange('reportDraftingComfort', rating)}
                   className="w-4 h-4 text-gold border-border focus:ring-gold"
                 />
-                <span className="text-xs text-text-secondary mt-1">
+                <span className="text-xs text-text-secondary mt-1 text-center">
                   {rating === 1 ? 'Very Uncomfortable' : rating === 5 ? 'Very Comfortable' : rating}
                 </span>
               </label>
@@ -505,7 +580,7 @@ const CreateAccountPage: React.FC = () => {
           Almost Ready!
         </h3>
         <p className="text-text-secondary">
-          Review your information and create your account
+          {getStepDescription(4)}
         </p>
       </div>
 
@@ -524,8 +599,16 @@ const CreateAccountPage: React.FC = () => {
             <p className="text-text-primary">{formData.profession.join(', ')}</p>
           </div>
           <div>
+            <span className="text-sm font-medium text-text-secondary">Student Population:</span>
+            <p className="text-text-primary">{formData.studentTypes.join(', ')}</p>
+          </div>
+          <div>
             <span className="text-sm font-medium text-text-secondary">Experience:</span>
             <p className="text-text-primary">{formData.yearsExperience.replace('-', ' to ')} years</p>
+          </div>
+          <div>
+            <span className="text-sm font-medium text-text-secondary">Caseload:</span>
+            <p className="text-text-primary">{formData.caseloadSize.replace('-', ' to ')} students</p>
           </div>
         </div>
       </div>
