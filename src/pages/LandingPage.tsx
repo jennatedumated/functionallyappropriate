@@ -50,12 +50,20 @@ const LandingPage: React.FC = () => {
               </div>
               <span className="text-xl font-semibold">IEP Case Manager</span>
             </div>
-            <Link 
-              to="/dashboard" 
-              className="text-text-secondary hover:text-text-primary transition-colors"
-            >
-              View Dashboard
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link 
+                to="/create-account" 
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Create Account
+              </Link>
+              <Link 
+                to="/dashboard" 
+                className="px-4 py-2 bg-purple text-white rounded-lg hover:bg-purple/90 transition-colors"
+              >
+                View Dashboard
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -81,14 +89,20 @@ const LandingPage: React.FC = () => {
               <span className="text-text-primary font-medium"> your students</span>.
             </p>
 
-            {/* CTA Button */}
-            <div className="mb-16">
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
               <Link
-                to="/dashboard"
+                to="/create-account"
                 className="inline-flex items-center px-8 py-4 bg-purple text-white text-lg font-semibold rounded-xl hover:bg-purple/90 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
                 Get Started Today
                 <ArrowRight className="ml-2" size={20} />
+              </Link>
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center px-8 py-4 border-2 border-purple text-purple text-lg font-semibold rounded-xl hover:bg-purple hover:text-white transition-all duration-200"
+              >
+                View Live Demo
               </Link>
             </div>
 
@@ -203,13 +217,21 @@ const LandingPage: React.FC = () => {
           <p className="text-lg text-text-secondary mb-10">
             Start managing your IEP caseload more efficiently today. No setup required.
           </p>
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center px-10 py-5 bg-purple text-white text-xl font-semibold rounded-xl hover:bg-purple/90 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            Explore the Dashboard
-            <ArrowRight className="ml-3" size={24} />
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/create-account"
+              className="inline-flex items-center px-10 py-5 bg-purple text-white text-xl font-semibold rounded-xl hover:bg-purple/90 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              Create Your Account
+              <ArrowRight className="ml-3" size={24} />
+            </Link>
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center px-10 py-5 border-2 border-purple text-purple text-xl font-semibold rounded-xl hover:bg-purple hover:text-white transition-all duration-200"
+            >
+              Explore the Dashboard
+            </Link>
+          </div>
         </div>
       </section>
 
