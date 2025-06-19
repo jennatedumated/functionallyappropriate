@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import LandingPage from './pages/LandingPage';
 import CreateAccountPage from './pages/CreateAccountPage';
+import PersonalizeDashboardPage from './pages/PersonalizeDashboardPage';
 import Scheduling from './pages/Scheduling';
 import GoalWriting from './pages/GoalWriting';
 import ReportDrafting from './pages/ReportDrafting';
@@ -15,6 +16,7 @@ function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/create-account" element={<CreateAccountPage />} />
+      <Route path="/personalize-dashboard" element={<PersonalizeDashboardPage />} />
       <Route path="/app" element={<Layout />}>
         <Route index element={<StudentDashboard />} />
         <Route path="scheduling" element={<Scheduling />} />

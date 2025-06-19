@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, ArrowLeft, CheckCircle, User, Briefcase, Settings, Shield, Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface FormData {
   // Basic Information
@@ -33,6 +33,7 @@ interface FormData {
 }
 
 const CreateAccountPage: React.FC = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -132,7 +133,8 @@ const CreateAccountPage: React.FC = () => {
   const handleSubmit = () => {
     // Here you would typically send the data to your backend
     console.log('Form submitted:', formData);
-    // Redirect to dashboard or success page
+    // Redirect to personalize dashboard page
+    navigate('/personalize-dashboard');
   };
 
   const getStepIcon = (step: number) => {
