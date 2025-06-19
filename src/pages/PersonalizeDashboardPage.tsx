@@ -1,15 +1,42 @@
 import React, { useState } from 'react';
-import { Upload, Plus, Check, Users, FileText, Settings, ArrowRight, Download, AlertCircle, X } from 'lucide-react';
+import { Upload, Plus, Check, Users, FileText, Settings, ArrowRight, Download, AlertCircle, X, ChevronDown, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Student {
   id: number;
+  // Personal Information
   firstName: string;
   lastName: string;
-  ssid: string;
-  address: string;
+  preferredName?: string;
+  dateOfBirth: string;
+  studentId: string;
+  gender: string;
+  ethnicity: string;
   grade: string;
+  
+  // Contact Information
+  address: string;
+  phone?: string;
+  email?: string;
+  emergencyContact: string;
+  
+  // Educational Information
+  program: string;
+  primaryDisability: string;
+  secondaryDisability?: string;
+  iepDate: string;
+  nextReview: string;
+  evaluationDate: string;
+  placement: string;
   caseManager: string;
+  
+  // Medical Information
+  medications: string[];
+  allergies: string[];
+  medicalConditions: string[];
+  accommodations: string[];
+  
+  // Parent/Guardian Information
   parent1Name: string;
   parent1Email: string;
   parent1Phone: string;
@@ -23,13 +50,49 @@ const PersonalizeDashboardPage: React.FC = () => {
   const [showManualForm, setShowManualForm] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [dragActive, setDragActive] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [expandedSections, setExpandedSections] = useState<{[key: string]: boolean}>({
+    personal: true,
+    contact: false,
+    educational: false,
+    medical: false,
+    parents: false
+  });
+
   const [formData, setFormData] = useState({
+    // Personal Information
     firstName: '',
     lastName: '',
-    ssid: '',
-    address: '',
+    preferredName: '',
+    dateOfBirth: '',
+    studentId: '',
+    gender: '',
+    ethnicity: '',
     grade: '',
+    
+    // Contact Information
+    address: '',
+    phone: '',
+    email: '',
+    emergencyContact: '',
+    
+    // Educational Information
+    program: '',
+    primaryDisability: '',
+    secondaryDisability: '',
+    iepDate: '',
+    nextReview: '',
+    evaluationDate: '',
+    placement: '',
     caseManager: '',
+    
+    // Medical Information
+    medications: '',
+    allergies: '',
+    medicalConditions: '',
+    accommodations: '',
+    
+    // Parent/Guardian Information
     parent1Name: '',
     parent1Email: '',
     parent1Phone: '',
@@ -43,26 +106,146 @@ const PersonalizeDashboardPage: React.FC = () => {
     '6th Grade', '7th Grade', '8th Grade', '9th Grade', '10th Grade', '11th Grade', '12th Grade'
   ];
 
-  const mandatoryColumns = [
+  const genderOptions = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
+  
+  const ethnicityOptions = [
+    'American Indian or Alaska Native',
+    'Asian',
+    'Black or African American',
+    'Hispanic/Latino',
+    'Native Hawaiian or Other Pacific Islander',
+    'White',
+    'Two or More Races',
+    'Prefer not to say'
+  ];
+
+  const programOptions = [
+    'Resource Support',
+    'Self-Contained',
+    'Inclusion',
+    'Extensive Support Needs (ESN)',
+    'Related Services Only'
+  ];
+
+  const disabilityOptions = [
+    'Specific Learning Disability',
+    'Intellectual Disability',
+    'Autism Spectrum Disorder',
+    'Emotional Disturbance',
+    'Speech or Language Impairment',
+    'Visual Impairment',
+    'Hearing Impairment',
+    'Orthopedic Impairment',
+    'Other Health Impairment',
+    'Multiple Disabilities',
+    'Deaf-Blindness',
+    'Traumatic Brain Injury',
+    'Developmental Delay'
+  ];
+
+  const placementOptions = [
+    'General Education with Resource Support',
+    'General Education with Inclusion Support',
+    'Special Education Classroom',
+    'Separate School',
+    'Home/Hospital',
+    'Residential Facility'
+  ];
+
+  // Essential columns for basic functionality
+  const essentialColumns = [
     'Student First Name',
-    'Student Last Name', 
-    'SSID (State Student ID)',
-    'Address',
+    'Student Last Name',
+    'Date of Birth',
+    'Student ID',
     'Grade',
     'Case Manager',
     'Parent 1 Name',
     'Parent 1 Email',
-    'Parent 1 Phone Number'
+    'Parent 1 Phone'
   ];
 
-  const optionalColumns = [
+  // Comprehensive columns for full demographics
+  const comprehensiveColumns = [
+    'Preferred Name',
+    'Gender',
+    'Ethnicity',
+    'Address',
+    'Emergency Contact',
+    'Program',
+    'Primary Disability',
+    'Secondary Disability',
+    'IEP Date',
+    'Next Review Date',
+    'Evaluation Date',
+    'Placement',
+    'Medications (semicolon separated)',
+    'Allergies (semicolon separated)',
+    'Medical Conditions (semicolon separated)',
+    'Accommodations (semicolon separated)',
     'Parent 2 Name',
-    'Parent 2 Email', 
-    'Parent 2 Phone Number'
+    'Parent 2 Email',
+    'Parent 2 Phone'
   ];
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1: // Personal Information
+        return !!(formData.firstName && formData.lastName && formData.dateOfBirth && 
+                 formData.studentId && formData.grade);
+      case 2: // Contact Information
+        return !!(formData.address && formData.emergencyContact);
+      case 3: // Educational Information
+        return !!(formData.program && formData.primaryDisability && formData.iepDate && 
+                 formData.placement && formData.caseManager);
+      case 4: // Medical Information (optional)
+        return true;
+      case 5: // Parent Information
+        return !!(formData.parent1Name && formData.parent1Email && formData.parent1Phone);
+      default:
+        return false;
+    }
+  };
+
+  const nextStep = () => {
+    if (validateStep(currentStep) && currentStep < 5) {
+      setCurrentStep(currentStep + 1);
+      // Auto-expand next section
+      const sections = ['personal', 'contact', 'educational', 'medical', 'parents'];
+      if (sections[currentStep]) {
+        setExpandedSections(prev => ({
+          ...prev,
+          [sections[currentStep - 1]]: false,
+          [sections[currentStep]]: true
+        }));
+      }
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+      // Auto-expand previous section
+      const sections = ['personal', 'contact', 'educational', 'medical', 'parents'];
+      if (sections[currentStep - 2]) {
+        setExpandedSections(prev => ({
+          ...prev,
+          [sections[currentStep - 1]]: false,
+          [sections[currentStep - 2]]: true
+        }));
+      }
+    }
   };
 
   const handleAddStudent = (e: React.FormEvent) => {
@@ -72,10 +255,28 @@ const PersonalizeDashboardPage: React.FC = () => {
       id: students.length + 1,
       firstName: formData.firstName,
       lastName: formData.lastName,
-      ssid: formData.ssid,
-      address: formData.address,
+      preferredName: formData.preferredName || undefined,
+      dateOfBirth: formData.dateOfBirth,
+      studentId: formData.studentId,
+      gender: formData.gender,
+      ethnicity: formData.ethnicity,
       grade: formData.grade,
+      address: formData.address,
+      phone: formData.phone || undefined,
+      email: formData.email || undefined,
+      emergencyContact: formData.emergencyContact,
+      program: formData.program,
+      primaryDisability: formData.primaryDisability,
+      secondaryDisability: formData.secondaryDisability || undefined,
+      iepDate: formData.iepDate,
+      nextReview: formData.nextReview,
+      evaluationDate: formData.evaluationDate,
+      placement: formData.placement,
       caseManager: formData.caseManager,
+      medications: formData.medications ? formData.medications.split(';').map(m => m.trim()).filter(m => m) : [],
+      allergies: formData.allergies ? formData.allergies.split(';').map(a => a.trim()).filter(a => a) : [],
+      medicalConditions: formData.medicalConditions ? formData.medicalConditions.split(';').map(c => c.trim()).filter(c => c) : [],
+      accommodations: formData.accommodations ? formData.accommodations.split(';').map(a => a.trim()).filter(a => a) : [],
       parent1Name: formData.parent1Name,
       parent1Email: formData.parent1Email,
       parent1Phone: formData.parent1Phone,
@@ -86,23 +287,19 @@ const PersonalizeDashboardPage: React.FC = () => {
 
     setStudents(prev => [...prev, newStudent]);
     
-    // Reset form
+    // Reset form and step
     setFormData({
-      firstName: '',
-      lastName: '',
-      ssid: '',
-      address: '',
-      grade: '',
-      caseManager: '',
-      parent1Name: '',
-      parent1Email: '',
-      parent1Phone: '',
-      parent2Name: '',
-      parent2Email: '',
-      parent2Phone: '',
+      firstName: '', lastName: '', preferredName: '', dateOfBirth: '', studentId: '', gender: '', ethnicity: '', grade: '',
+      address: '', phone: '', email: '', emergencyContact: '',
+      program: '', primaryDisability: '', secondaryDisability: '', iepDate: '', nextReview: '', evaluationDate: '', placement: '', caseManager: '',
+      medications: '', allergies: '', medicalConditions: '', accommodations: '',
+      parent1Name: '', parent1Email: '', parent1Phone: '', parent2Name: '', parent2Email: '', parent2Phone: '',
     });
+    
+    setCurrentStep(1);
+    setExpandedSections({ personal: true, contact: false, educational: false, medical: false, parents: false });
 
-    // Show success message briefly
+    // Show success message
     setTimeout(() => {
       const successMsg = document.getElementById('success-message');
       if (successMsg) {
@@ -119,16 +316,33 @@ const PersonalizeDashboardPage: React.FC = () => {
     
     // Simulate file processing
     setTimeout(() => {
-      // Mock successful upload with sample students
+      // Mock successful upload with comprehensive sample students
       const mockStudents: Student[] = [
         {
           id: 1,
           firstName: 'John',
           lastName: 'Smith',
-          ssid: 'ST001234567',
-          address: '123 Main St, Anytown, ST 12345',
+          preferredName: 'Johnny',
+          dateOfBirth: '2015-03-15',
+          studentId: 'STU-2025-001',
+          gender: 'Male',
+          ethnicity: 'Hispanic/Latino',
           grade: '3rd Grade',
+          address: '123 Main Street, Anytown, ST 12345',
+          phone: '(555) 123-4567',
+          emergencyContact: 'Maria Smith - (555) 987-6543',
+          program: 'Resource Support',
+          primaryDisability: 'Specific Learning Disability',
+          secondaryDisability: 'ADHD',
+          iepDate: '2024-09-15',
+          nextReview: '2025-09-15',
+          evaluationDate: '2024-08-01',
+          placement: 'General Education with Resource Support',
           caseManager: 'Sarah Johnson',
+          medications: ['Adderall XR 10mg - Morning', 'Melatonin 3mg - Bedtime'],
+          allergies: ['Peanuts', 'Tree Nuts'],
+          medicalConditions: ['ADHD', 'Mild Asthma'],
+          accommodations: ['Extended time', 'Frequent breaks', 'Preferential seating'],
           parent1Name: 'Maria Smith',
           parent1Email: 'maria.smith@email.com',
           parent1Phone: '(555) 123-4567',
@@ -137,29 +351,31 @@ const PersonalizeDashboardPage: React.FC = () => {
           id: 2,
           firstName: 'Emily',
           lastName: 'Johnson',
-          ssid: 'ST001234568',
-          address: '456 Oak Ave, Anytown, ST 12345',
+          dateOfBirth: '2014-07-22',
+          studentId: 'STU-2025-002',
+          gender: 'Female',
+          ethnicity: 'White',
           grade: '4th Grade',
+          address: '456 Oak Avenue, Anytown, ST 12345',
+          emergencyContact: 'David Johnson - (555) 234-5678',
+          program: 'Inclusion',
+          primaryDisability: 'Autism Spectrum Disorder',
+          iepDate: '2024-10-10',
+          nextReview: '2025-10-10',
+          evaluationDate: '2024-09-15',
+          placement: 'General Education with Inclusion Support',
           caseManager: 'Sarah Johnson',
+          medications: [],
+          allergies: ['Dairy'],
+          medicalConditions: ['Autism Spectrum Disorder'],
+          accommodations: ['Visual schedules', 'Sensory breaks', 'Modified assignments'],
           parent1Name: 'David Johnson',
           parent1Email: 'david.johnson@email.com',
           parent1Phone: '(555) 234-5678',
           parent2Name: 'Lisa Johnson',
           parent2Email: 'lisa.johnson@email.com',
           parent2Phone: '(555) 234-5679',
-        },
-        {
-          id: 3,
-          firstName: 'Michael',
-          lastName: 'Davis',
-          ssid: 'ST001234569',
-          address: '789 Pine Rd, Anytown, ST 12345',
-          grade: '2nd Grade',
-          caseManager: 'Sarah Johnson',
-          parent1Name: 'Jennifer Davis',
-          parent1Email: 'jennifer.davis@email.com',
-          parent1Phone: '(555) 345-6789',
-        },
+        }
       ];
       
       setStudents(mockStudents);
@@ -194,22 +410,63 @@ const PersonalizeDashboardPage: React.FC = () => {
   };
 
   const downloadTemplate = () => {
-    // Create CSV template
-    const headers = [...mandatoryColumns, ...optionalColumns];
+    // Create comprehensive CSV template
+    const headers = [...essentialColumns, ...comprehensiveColumns];
     const csvContent = headers.join(',') + '\n';
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'bettersped_student_roster_template.csv';
+    a.download = 'bettersped_comprehensive_student_roster_template.csv';
     a.click();
     window.URL.revokeObjectURL(url);
   };
 
-  const isFormValid = () => {
-    return formData.firstName && formData.lastName && formData.ssid && 
-           formData.address && formData.grade && formData.caseManager &&
-           formData.parent1Name && formData.parent1Email && formData.parent1Phone;
+  const renderFormSection = (
+    sectionKey: string,
+    title: string,
+    stepNumber: number,
+    children: React.ReactNode,
+    isRequired: boolean = true
+  ) => {
+    const isExpanded = expandedSections[sectionKey];
+    const isCompleted = validateStep(stepNumber);
+    const isCurrent = currentStep === stepNumber;
+    
+    return (
+      <div className={`border rounded-lg transition-all ${
+        isCurrent ? 'border-purple bg-purple/5' : 
+        isCompleted ? 'border-green bg-green/5' : 
+        'border-border'
+      }`}>
+        <button
+          type="button"
+          onClick={() => toggleSection(sectionKey)}
+          className="w-full p-4 flex items-center justify-between text-left hover:bg-bg-secondary transition-colors"
+        >
+          <div className="flex items-center space-x-3">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
+              isCompleted ? 'bg-green text-white' :
+              isCurrent ? 'bg-purple text-white' :
+              'bg-bg-secondary text-text-secondary'
+            }`}>
+              {isCompleted ? <Check size={16} /> : stepNumber}
+            </div>
+            <div>
+              <h3 className="font-semibold text-text-primary">{title}</h3>
+              {!isRequired && <span className="text-xs text-text-secondary">(Optional)</span>}
+            </div>
+          </div>
+          {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+        </button>
+        
+        {isExpanded && (
+          <div className="px-4 pb-4 space-y-4">
+            {children}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -241,8 +498,8 @@ const PersonalizeDashboardPage: React.FC = () => {
             Welcome to BetterSped!
           </h2>
           <p className="text-lg text-text-secondary max-w-3xl mx-auto leading-relaxed">
-            Adding your student data is crucial for BetterSped to become a powerful tool for you. 
-            Let's get your student roster set up so you can start managing IEPs, goals, and reports more efficiently.
+            Adding comprehensive student data enables BetterSped to provide powerful insights and streamlined workflows. 
+            Start with essential information and add more details as needed.
           </p>
         </div>
 
@@ -293,34 +550,49 @@ const PersonalizeDashboardPage: React.FC = () => {
             </div>
             
             <p className="text-text-secondary mb-6">
-              Quickly import student data by uploading a spreadsheet. BetterSped will create a profile 
-              for each student based on the provided information.
+              Import comprehensive student data including demographics, educational information, and contact details.
             </p>
 
-            {/* Mandatory Columns */}
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <div className="flex items-start space-x-2 mb-3">
-                <AlertCircle className="text-red-600 dark:text-red-400 mt-0.5" size={20} />
-                <div>
-                  <h4 className="font-semibold text-red-700 dark:text-red-300">Crucial Note:</h4>
-                  <p className="text-sm text-red-600 dark:text-red-400">
-                    Your spreadsheet must include the following columns for BetterSped to properly create student profiles:
-                  </p>
+            {/* Essential vs Comprehensive Columns */}
+            <div className="mb-6 space-y-4">
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="flex items-start space-x-2 mb-3">
+                  <AlertCircle className="text-red-600 dark:text-red-400 mt-0.5" size={20} />
+                  <div>
+                    <h4 className="font-semibold text-red-700 dark:text-red-300">Essential Columns (Required):</h4>
+                    <p className="text-sm text-red-600 dark:text-red-400 mb-2">
+                      These columns are required for basic functionality:
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                  {essentialColumns.map((column, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-red-700 dark:text-red-300">{column}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {mandatoryColumns.map((column, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-red-700 dark:text-red-300">{column}</span>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mt-4 pt-3 border-t border-red-200 dark:border-red-800">
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  <strong>Optional columns:</strong> {optionalColumns.join(', ')}
+
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">
+                  Additional Columns (Optional but Recommended):
+                </h4>
+                <p className="text-sm text-blue-600 dark:text-blue-400 mb-2">
+                  Include these for comprehensive student profiles:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                  {comprehensiveColumns.slice(0, 8).map((column, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-xs text-blue-700 dark:text-blue-300">{column}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                  ...and {comprehensiveColumns.length - 8} more columns for complete demographics
                 </p>
               </div>
             </div>
@@ -385,7 +657,7 @@ const PersonalizeDashboardPage: React.FC = () => {
                 className="inline-flex items-center text-sm text-purple hover:underline"
               >
                 <Download className="mr-1" size={16} />
-                Download Template Spreadsheet
+                Download Comprehensive Template
               </button>
             </div>
           </div>
@@ -398,14 +670,11 @@ const PersonalizeDashboardPage: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-text-primary">
-                  Option 2: Add a Single Student Manually
+                  Option 2: Add Student Manually
                 </h3>
+                <p className="text-sm text-text-secondary">Complete student profile with all demographics</p>
               </div>
             </div>
-            
-            <p className="text-text-secondary mb-6">
-              Enter student details one by one using the form below.
-            </p>
 
             {!showManualForm ? (
               <button
@@ -416,7 +685,7 @@ const PersonalizeDashboardPage: React.FC = () => {
                 <span className="font-medium">Click to add a student manually</span>
               </button>
             ) : (
-              <form onSubmit={handleAddStudent} className="space-y-4">
+              <form onSubmit={handleAddStudent} className="space-y-6">
                 {/* Success Message */}
                 <div id="success-message" className="hidden p-3 bg-green/10 border border-green/20 rounded-lg">
                   <div className="flex items-center space-x-2">
@@ -427,202 +696,536 @@ const PersonalizeDashboardPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-text-primary mb-1">
-                      First Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text-primary mb-1">
-                      Last Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
-                      required
-                    />
+                {/* Form Progress */}
+                <div className="flex items-center justify-between mb-6 p-3 bg-bg-secondary rounded-lg">
+                  <span className="text-sm font-medium">Step {currentStep} of 5</span>
+                  <div className="flex space-x-1">
+                    {[1, 2, 3, 4, 5].map((step) => (
+                      <div
+                        key={step}
+                        className={`w-2 h-2 rounded-full ${
+                          step <= currentStep ? 'bg-purple' : 'bg-border'
+                        }`}
+                      />
+                    ))}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-text-primary mb-1">
-                      SSID (State Student ID) *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.ssid}
-                      onChange={(e) => handleInputChange('ssid', e.target.value)}
-                      className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
-                      required
-                    />
+                {/* Personal Information */}
+                {renderFormSection('personal', 'Personal Information', 1, (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          First Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.firstName}
+                          onChange={(e) => handleInputChange('firstName', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Last Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.lastName}
+                          onChange={(e) => handleInputChange('lastName', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Preferred Name
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.preferredName}
+                          onChange={(e) => handleInputChange('preferredName', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          placeholder="Optional"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Date of Birth *
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.dateOfBirth}
+                          onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Student ID *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.studentId}
+                          onChange={(e) => handleInputChange('studentId', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Gender
+                        </label>
+                        <select
+                          value={formData.gender}
+                          onChange={(e) => handleInputChange('gender', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                        >
+                          <option value="">Select Gender</option>
+                          {genderOptions.map(option => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Grade *
+                        </label>
+                        <select
+                          value={formData.grade}
+                          onChange={(e) => handleInputChange('grade', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          required
+                        >
+                          <option value="">Select Grade</option>
+                          {grades.map(grade => (
+                            <option key={grade} value={grade}>{grade}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-text-primary mb-1">
+                        Ethnicity
+                      </label>
+                      <select
+                        value={formData.ethnicity}
+                        onChange={(e) => handleInputChange('ethnicity', e.target.value)}
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                      >
+                        <option value="">Select Ethnicity</option>
+                        {ethnicityOptions.map(option => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text-primary mb-1">
-                      Grade *
-                    </label>
-                    <select
-                      value={formData.grade}
-                      onChange={(e) => handleInputChange('grade', e.target.value)}
-                      className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
-                      required
-                    >
-                      <option value="">Select Grade</option>
-                      {grades.map(grade => (
-                        <option key={grade} value={grade}>{grade}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+                ))}
 
-                <div>
-                  <label className="block text-sm font-medium text-text-primary mb-1">
-                    Address *
-                  </label>
-                  <textarea
-                    value={formData.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
-                    rows={2}
-                    placeholder="Street, City, State, ZIP"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-text-primary mb-1">
-                    Case Manager *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.caseManager}
-                    onChange={(e) => handleInputChange('caseManager', e.target.value)}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
-                    placeholder="Your name or assigned case manager"
-                    required
-                  />
-                </div>
-
-                {/* Parent 1 Information */}
-                <div className="border-t border-border pt-4">
-                  <h4 className="font-medium text-text-primary mb-3">Parent/Guardian 1 Information *</h4>
+                {/* Contact Information */}
+                {renderFormSection('contact', 'Contact Information', 2, (
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-text-primary mb-1">
-                        Name *
+                        Address *
                       </label>
-                      <input
-                        type="text"
-                        value={formData.parent1Name}
-                        onChange={(e) => handleInputChange('parent1Name', e.target.value)}
+                      <textarea
+                        value={formData.address}
+                        onChange={(e) => handleInputChange('address', e.target.value)}
                         className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                        rows={2}
+                        placeholder="Street, City, State, ZIP"
                         required
                       />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-text-primary mb-1">
-                          Email *
-                        </label>
-                        <input
-                          type="email"
-                          value={formData.parent1Email}
-                          onChange={(e) => handleInputChange('parent1Email', e.target.value)}
-                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-text-primary mb-1">
-                          Phone *
-                        </label>
-                        <input
-                          type="tel"
-                          value={formData.parent1Phone}
-                          onChange={(e) => handleInputChange('parent1Phone', e.target.value)}
-                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
-                          placeholder="(555) 123-4567"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Parent 2 Information */}
-                <div className="border-t border-border pt-4">
-                  <h4 className="font-medium text-text-primary mb-3">Parent/Guardian 2 Information (Optional)</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.parent2Name}
-                        onChange={(e) => handleInputChange('parent2Name', e.target.value)}
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
-                      />
-                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-text-primary mb-1">
-                          Email
-                        </label>
-                        <input
-                          type="email"
-                          value={formData.parent2Email}
-                          onChange={(e) => handleInputChange('parent2Email', e.target.value)}
-                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
-                        />
-                      </div>
                       <div>
                         <label className="block text-sm font-medium text-text-primary mb-1">
                           Phone
                         </label>
                         <input
                           type="tel"
-                          value={formData.parent2Phone}
-                          onChange={(e) => handleInputChange('parent2Phone', e.target.value)}
+                          value={formData.phone}
+                          onChange={(e) => handleInputChange('phone', e.target.value)}
                           className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
                           placeholder="(555) 123-4567"
                         />
                       </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          placeholder="student@school.edu"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-text-primary mb-1">
+                        Emergency Contact *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.emergencyContact}
+                        onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                        placeholder="Name - Phone Number"
+                        required
+                      />
                     </div>
                   </div>
-                </div>
+                ))}
 
-                <div className="flex justify-between items-center pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowManualForm(false)}
-                    className="flex items-center text-text-secondary hover:text-text-primary transition-colors"
-                  >
-                    <X className="mr-1" size={16} />
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={!isFormValid()}
-                    className={`flex items-center px-6 py-3 rounded-lg font-semibold transition-all ${
-                      isFormValid()
-                        ? 'bg-purple text-white hover:bg-purple/90'
-                        : 'bg-bg-secondary text-text-secondary cursor-not-allowed'
-                    }`}
-                  >
-                    <Plus className="mr-2" size={20} />
-                    Add Student
-                  </button>
+                {/* Educational Information */}
+                {renderFormSection('educational', 'Educational Information', 3, (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Program *
+                        </label>
+                        <select
+                          value={formData.program}
+                          onChange={(e) => handleInputChange('program', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          required
+                        >
+                          <option value="">Select Program</option>
+                          {programOptions.map(option => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Case Manager *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.caseManager}
+                          onChange={(e) => handleInputChange('caseManager', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          placeholder="Your name or assigned case manager"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Primary Disability *
+                        </label>
+                        <select
+                          value={formData.primaryDisability}
+                          onChange={(e) => handleInputChange('primaryDisability', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          required
+                        >
+                          <option value="">Select Primary Disability</option>
+                          {disabilityOptions.map(option => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Secondary Disability
+                        </label>
+                        <select
+                          value={formData.secondaryDisability}
+                          onChange={(e) => handleInputChange('secondaryDisability', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                        >
+                          <option value="">Select Secondary Disability</option>
+                          {disabilityOptions.map(option => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-text-primary mb-1">
+                        Placement *
+                      </label>
+                      <select
+                        value={formData.placement}
+                        onChange={(e) => handleInputChange('placement', e.target.value)}
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                        required
+                      >
+                        <option value="">Select Placement</option>
+                        {placementOptions.map(option => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          IEP Date *
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.iepDate}
+                          onChange={(e) => handleInputChange('iepDate', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Next Review
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.nextReview}
+                          onChange={(e) => handleInputChange('nextReview', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Evaluation Date
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.evaluationDate}
+                          onChange={(e) => handleInputChange('evaluationDate', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ), true)}
+
+                {/* Medical Information */}
+                {renderFormSection('medical', 'Medical & Accommodations', 4, (
+                  <div className="space-y-4">
+                    <p className="text-sm text-text-secondary">
+                      Separate multiple items with semicolons (;)
+                    </p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Medications
+                        </label>
+                        <textarea
+                          value={formData.medications}
+                          onChange={(e) => handleInputChange('medications', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          rows={2}
+                          placeholder="e.g., Adderall XR 10mg - Morning; Melatonin 3mg - Bedtime"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Allergies
+                        </label>
+                        <textarea
+                          value={formData.allergies}
+                          onChange={(e) => handleInputChange('allergies', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          rows={2}
+                          placeholder="e.g., Peanuts; Tree Nuts; Dairy"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Medical Conditions
+                        </label>
+                        <textarea
+                          value={formData.medicalConditions}
+                          onChange={(e) => handleInputChange('medicalConditions', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          rows={2}
+                          placeholder="e.g., ADHD; Mild Asthma; Diabetes"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1">
+                          Accommodations
+                        </label>
+                        <textarea
+                          value={formData.accommodations}
+                          onChange={(e) => handleInputChange('accommodations', e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          rows={2}
+                          placeholder="e.g., Extended time; Frequent breaks; Preferential seating"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ), false)}
+
+                {/* Parent Information */}
+                {renderFormSection('parents', 'Parent/Guardian Information', 5, (
+                  <div className="space-y-6">
+                    {/* Parent 1 */}
+                    <div className="border-t border-border pt-4">
+                      <h4 className="font-medium text-text-primary mb-3">Parent/Guardian 1 *</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-text-primary mb-1">
+                            Name *
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.parent1Name}
+                            onChange={(e) => handleInputChange('parent1Name', e.target.value)}
+                            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                            required
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-text-primary mb-1">
+                              Email *
+                            </label>
+                            <input
+                              type="email"
+                              value={formData.parent1Email}
+                              onChange={(e) => handleInputChange('parent1Email', e.target.value)}
+                              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-text-primary mb-1">
+                              Phone *
+                            </label>
+                            <input
+                              type="tel"
+                              value={formData.parent1Phone}
+                              onChange={(e) => handleInputChange('parent1Phone', e.target.value)}
+                              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                              placeholder="(555) 123-4567"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Parent 2 */}
+                    <div className="border-t border-border pt-4">
+                      <h4 className="font-medium text-text-primary mb-3">Parent/Guardian 2 (Optional)</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-text-primary mb-1">
+                            Name
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.parent2Name}
+                            onChange={(e) => handleInputChange('parent2Name', e.target.value)}
+                            className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-text-primary mb-1">
+                              Email
+                            </label>
+                            <input
+                              type="email"
+                              value={formData.parent2Email}
+                              onChange={(e) => handleInputChange('parent2Email', e.target.value)}
+                              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-text-primary mb-1">
+                              Phone
+                            </label>
+                            <input
+                              type="tel"
+                              value={formData.parent2Phone}
+                              onChange={(e) => handleInputChange('parent2Phone', e.target.value)}
+                              className="w-full px-3 py-2 border border-border rounded-lg bg-bg-primary focus:outline-none focus:ring-2 focus:ring-purple focus:border-transparent"
+                              placeholder="(555) 123-4567"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Navigation Buttons */}
+                <div className="flex justify-between items-center pt-6 border-t border-border">
+                  <div className="flex space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowManualForm(false)}
+                      className="flex items-center text-text-secondary hover:text-text-primary transition-colors"
+                    >
+                      <X className="mr-1" size={16} />
+                      Cancel
+                    </button>
+                    {currentStep > 1 && (
+                      <button
+                        type="button"
+                        onClick={prevStep}
+                        className="flex items-center px-4 py-2 border border-border rounded-lg hover:bg-bg-secondary transition-colors"
+                      >
+                        Previous
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex space-x-3">
+                    {currentStep < 5 ? (
+                      <button
+                        type="button"
+                        onClick={nextStep}
+                        disabled={!validateStep(currentStep)}
+                        className={`flex items-center px-6 py-2 rounded-lg font-medium transition-all ${
+                          validateStep(currentStep)
+                            ? 'bg-purple text-white hover:bg-purple/90'
+                            : 'bg-bg-secondary text-text-secondary cursor-not-allowed'
+                        }`}
+                      >
+                        Next
+                        <ArrowRight className="ml-1" size={16} />
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={!validateStep(5)}
+                        className={`flex items-center px-6 py-2 rounded-lg font-semibold transition-all ${
+                          validateStep(5)
+                            ? 'bg-purple text-white hover:bg-purple/90'
+                            : 'bg-bg-secondary text-text-secondary cursor-not-allowed'
+                        }`}
+                      >
+                        <Plus className="mr-2" size={20} />
+                        Add Student
+                      </button>
+                    )}
+                  </div>
                 </div>
               </form>
             )}
@@ -642,28 +1245,28 @@ const PersonalizeDashboardPage: React.FC = () => {
             </div>
             
             <p className="text-text-secondary mb-6">
-              Once your students are added, you can further enrich each profile with critical details. 
-              For each student, you will be able to:
+              Your comprehensive student profiles are ready! You can now access detailed demographics, 
+              track progress, and manage IEPs with all the information you've provided.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <button className="p-4 border border-border rounded-lg hover:border-purple/30 transition-all text-left">
                 <div className="flex items-center space-x-3 mb-2">
                   <FileText className="text-purple" size={20} />
-                  <span className="font-medium">Upload Most Recent IEP</span>
+                  <span className="font-medium">Upload IEP Documents</span>
                 </div>
                 <p className="text-sm text-text-secondary">
-                  Import existing IEP documents to automatically populate goals and accommodations
+                  Import existing IEP documents to automatically populate goals and services
                 </p>
               </button>
               
               <button className="p-4 border border-border rounded-lg hover:border-purple/30 transition-all text-left">
                 <div className="flex items-center space-x-3 mb-2">
                   <Users className="text-purple" size={20} />
-                  <span className="font-medium">Add More Student Details</span>
+                  <span className="font-medium">Set Up Progress Tracking</span>
                 </div>
                 <p className="text-sm text-text-secondary">
-                  Include primary disability, IEP due dates, reevaluation dates, specific accommodations, and service hours
+                  Configure data collection and progress monitoring for each student
                 </p>
               </button>
             </div>
@@ -686,16 +1289,21 @@ const PersonalizeDashboardPage: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4">Added Students ({students.length})</h3>
             <div className="space-y-3">
               {students.map((student) => (
-                <div key={student.id} className="flex items-center justify-between p-3 bg-bg-secondary rounded-lg">
-                  <div>
-                    <h4 className="font-medium">{student.firstName} {student.lastName}</h4>
-                    <p className="text-sm text-text-secondary">
-                      {student.grade} • Case Manager: {student.caseManager}
-                    </p>
+                <div key={student.id} className="flex items-center justify-between p-4 bg-bg-secondary rounded-lg">
+                  <div className="flex-1">
+                    <h4 className="font-medium">
+                      {student.firstName} {student.lastName}
+                      {student.preferredName && ` (${student.preferredName})`}
+                    </h4>
+                    <div className="text-sm text-text-secondary space-y-1">
+                      <p>{student.grade} • {student.program} • Case Manager: {student.caseManager}</p>
+                      <p>Primary Disability: {student.primaryDisability}</p>
+                      {student.iepDate && <p>IEP Date: {new Date(student.iepDate).toLocaleDateString()}</p>}
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="px-2 py-1 bg-green/20 text-green text-xs rounded-full">
-                      Added
+                    <span className="px-3 py-1 bg-green/20 text-green text-sm rounded-full">
+                      Complete Profile
                     </span>
                   </div>
                 </div>
@@ -712,7 +1320,7 @@ const PersonalizeDashboardPage: React.FC = () => {
               Ready to get started?
             </h3>
             <p className="text-text-secondary mb-6">
-              Add your first student using either the spreadsheet upload or manual entry above.
+              Add your first student with comprehensive demographics using either upload or manual entry above.
             </p>
           </div>
         )}
