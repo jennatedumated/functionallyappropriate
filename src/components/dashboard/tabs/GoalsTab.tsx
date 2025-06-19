@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Target, Plus, Save, Calendar, CheckCircle, Clock, Edit3, Trash2, Upload, Download, DragDropContext, Droppable, Draggable } from 'lucide-react';
+import { Target, Plus, Save, Calendar, CheckCircle, Clock, Edit3, Trash2, Upload, Download, Contrast as DragDropContext, Droplet as Droppable, Cable as Draggable } from 'lucide-react';
 
 interface Goal {
   id: number;
