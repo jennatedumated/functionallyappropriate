@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import TabNavigation, { TabType } from '../components/dashboard/TabNavigation';
 import OverviewTab from '../components/dashboard/tabs/OverviewTab';
 import DemographicsTab from '../components/dashboard/tabs/DemographicsTab';
+import GoalsTab from '../components/dashboard/tabs/GoalsTab';
 import BehaviorTab from '../components/dashboard/tabs/BehaviorTab';
 import SensoryBreakModal from '../components/dashboard/SensoryBreakModal';
 
@@ -108,15 +109,7 @@ const StudentDashboard: React.FC = () => {
       case 'demographics':
         return <DemographicsTab />;
       case 'goals':
-        return (
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-4">IEP Goals Management</h3>
-            <p className="text-text-secondary">
-              Detailed goal tracking, progress monitoring, and goal modification tools will be available here.
-              This will integrate with the existing Goal Writing page for comprehensive goal management.
-            </p>
-          </div>
-        );
+        return <GoalsTab />;
       case 'behavior':
         return <BehaviorTab />;
       case 'services':

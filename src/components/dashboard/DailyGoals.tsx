@@ -38,7 +38,7 @@ const DailyGoals: React.FC<DailyGoalsProps> = ({ goals, onToggleGoal, selectedDa
     <div className="card container-safe">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
         <div className="flex items-center space-x-2">
-          <Target className="text-purple flex-shrink-0" size={20} />
+          <Target className="text-green flex-shrink-0" size={20} />
           <h3 className="text-lg font-semibold">Today's Goals</h3>
         </div>
         <div className="flex items-center space-x-2 text-sm text-text-secondary">
@@ -47,16 +47,16 @@ const DailyGoals: React.FC<DailyGoalsProps> = ({ goals, onToggleGoal, selectedDa
         </div>
       </div>
       
-      <div className="mb-4 p-3 bg-purple/10 rounded-lg border border-purple/20">
+      <div className="mb-4 p-3 bg-green/10 rounded-lg border border-green/20">
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Progress Today</span>
-          <span className="text-sm text-purple font-semibold">
+          <span className="text-sm text-green font-semibold">
             {completedGoals}/{totalGoals} Complete
           </span>
         </div>
         <div className="mt-2 w-full bg-bg-secondary rounded-full h-2">
           <div 
-            className="bg-purple h-2 rounded-full transition-all duration-300" 
+            className="bg-green h-2 rounded-full transition-all duration-300" 
             style={{ width: `${totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0}%` }}
           ></div>
         </div>
@@ -69,7 +69,7 @@ const DailyGoals: React.FC<DailyGoalsProps> = ({ goals, onToggleGoal, selectedDa
             className={`flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer ${
               goal.completed 
                 ? 'bg-green/10 border-green/20' 
-                : 'bg-bg-secondary border-border hover:border-purple/30'
+                : 'bg-bg-secondary border-border hover:border-green/30'
             }`}
             onClick={() => onToggleGoal(goal.id)}
           >
@@ -77,7 +77,7 @@ const DailyGoals: React.FC<DailyGoalsProps> = ({ goals, onToggleGoal, selectedDa
               {goal.completed ? (
                 <CheckCircle2 size={20} className="text-green" />
               ) : (
-                <Circle size={20} className="text-text-secondary hover:text-purple" />
+                <Circle size={20} className="text-text-secondary hover:text-green" />
               )}
             </button>
             
@@ -107,7 +107,7 @@ const DailyGoals: React.FC<DailyGoalsProps> = ({ goals, onToggleGoal, selectedDa
         <div className="text-center py-8 text-text-secondary">
           <Target size={40} className="mx-auto mb-2 opacity-30" />
           <p>No goals assigned for today</p>
-          <button className="mt-2 text-purple hover:underline text-sm">
+          <button className="mt-2 text-green hover:underline text-sm">
             Assign Goals
           </button>
         </div>
